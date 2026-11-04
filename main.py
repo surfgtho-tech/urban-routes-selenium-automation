@@ -1,5 +1,7 @@
 import data
 import helpers
+from selenium import webdriver
+from pages import UrbanRoutesPage
 
 
 class TestUrbanRoutes:
@@ -12,44 +14,70 @@ class TestUrbanRoutes:
         else:
             print("Não foi possível conectar ao Urban Routes. Verifique se o servidor está ligado e ainda em execução.")
 
+        # não modifique, pois precisamos do registro adicional habilitado para recuperar o código de confirmação do telefone
+        from selenium.webdriver import DesiredCapabilities
+        capabilities = DesiredCapabilities.CHROME
+        capabilities["goog:loggingPrefs"] = {'performance': 'ALL'}
+        # No Selenium 4 as capabilities precisam ser passadas pelas opções do Chrome
+        options = webdriver.ChromeOptions()
+        options.set_capability("goog:loggingPrefs", capabilities["goog:loggingPrefs"])
+        cls.driver = webdriver.Chrome(options=options)
+
+    def open_page(self):
+        # Abre a página inicial e define a rota, passo comum a todos os testes
+        self.driver.get(data.URBAN_ROUTES_URL)
+        routes_page = UrbanRoutesPage(self.driver)
+        routes_page.set_route(data.ADDRESS_FROM, data.ADDRESS_TO)
+        return routes_page
+
     def test_set_route(self):
-        # Adicionar em S8
-        print("função criada para definir a rota")
-        pass
+        routes_page = self.open_page()
+        assert routes_page.get_from() == data.ADDRESS_FROM
+        assert routes_page.get_to() == data.ADDRESS_TO
 
     def test_select_plan(self):
-        # Adicionar em S8
-        print("função criada para selecionar o plano")
-        pass
+        routes_page = self.open_page()
+        routes_page.select_comfort_plan()
+        assert routes_page.get_selected_plan() == 'Comfort'
 
     def test_fill_phone_number(self):
-        # Adicionar em S8
-        print("função criada para preencher o número de telefone")
-        pass
+        routes_page = self.open_page()
+        routes_page.select_comfort_plan()
+        routes_page.fill_phone_number(data.PHONE_NUMBER)
+        assert routes_page.get_phone_number() == data.PHONE_NUMBER
 
     def test_fill_card(self):
-        # Adicionar em S8
-        print("função criada para preencher o cartão")
-        pass
+        routes_page = self.open_page()
+        routes_page.select_comfort_plan()
+        routes_page.add_card(data.CARD_NUMBER, data.CARD_CODE)
+        assert routes_page.get_payment_method() == 'Cartão'
 
     def test_comment_for_driver(self):
-        # Adicionar em S8
-        print("função criada para deixar um comentário para o motorista")
-        pass
+        routes_page = self.open_page()
+        routes_page.select_comfort_plan()
+        routes_page.set_comment(data.MESSAGE_FOR_DRIVER)
+        assert routes_page.get_comment() == data.MESSAGE_FOR_DRIVER
 
     def test_order_blanket_and_handkerchiefs(self):
-        # Adicionar em S8
-        print("função criada para pedir cobertor e lenços")
-        pass
+        routes_page = self.open_page()
+        routes_page.select_comfort_plan()
+        routes_page.order_blanket_and_handkerchiefs()
+        assert routes_page.is_blanket_selected()
 
     def test_order_2_ice_creams(self):
-        # Pede 2 sorvetes: o ciclo é executado duas vezes, uma para cada sorvete
-        for i in range(2):
-            # Adicionar em S8
-            pass
-        print("função criada para pedir 2 sorvetes")
+        routes_page = self.open_page()
+        routes_page.select_comfort_plan()
+        routes_page.order_ice_creams(2)
+        assert routes_page.get_ice_cream_count() == 2
 
     def test_car_search_model_appears(self):
-        # Adicionar em S8
-        print("função criada para verificar se o modal de busca de carro aparece")
-        pass
+        routes_page = self.open_page()
+        routes_page.select_comfort_plan()
+        routes_page.fill_phone_number(data.PHONE_NUMBER)
+        routes_page.set_comment(data.MESSAGE_FOR_DRIVER)
+        routes_page.order_taxi()
+        assert routes_page.is_car_search_modal_displayed()
+
+    @classmethod
+    def teardown_class(cls):
+        cls.driver.quit()
