@@ -64,10 +64,3 @@ The suite covers the full ordering flow: setting a route, choosing a tariff, ver
 
 **William Cunha** — Junior QA Tester
 [LinkedIn](https://www.linkedin.com/in/william-cunha-429359348/) · [GitHub](https://github.com/surfgtho-tech)
-
-Como colar:
-
-No repositório, abra o README.md e clique no ícone de lápis (✏️).
-Apague tudo (Ctrl+A, Delete) e cole o texto.
-Clique em Commit changes... e use uma mensagem como docs: update README with project overview.
-Clique em Commit changes de novo pra confirmar.
